@@ -4,10 +4,12 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import asyncio
 import time
-from models.model_manager import model_manager
 from config import DEFAULT_GENERATION_CONFIG, SERVER_CONFIG
 from utils.logger_local import *
 import uvicorn
+
+# 延迟导入 model_manager，避免在模块导入时初始化
+model_manager = None
 
 # logger = setup_logger()
 
@@ -69,6 +71,10 @@ app = FastAPI(title="vLLM Multi-Model API",
 @app.on_event("startup")
 async def startup_event():
     """应用启动事件"""
+    global model_manager
+    # 延迟初始化模型管理器，避免 multiprocessing 问题
+    from models.model_manager import get_model_manager
+    model_manager = get_model_manager()
     logger.info("Starting vLLM Multi-Model API server...")
     logger.info(
         f"Server will run on {SERVER_CONFIG['host']}:{SERVER_CONFIG['port']}")

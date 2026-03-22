@@ -7,7 +7,7 @@ import os
 os.environ["cuda_visible_devices"] = "0"  # 设置可见的 GPU 设备
 
 # 模型名称
-model_name = "./llm_models/Qwen3-8B"  # 替换为你的模型名称
+model_name = "/home/work/Qwen3-8B"  # 替换为你的模型名称
 
 # 加载 tokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_name)

@@ -1,6 +1,12 @@
 # utils/vllm_engine.py
 from vllm import SamplingParams
-from vllm.engine.async_llm_engine import AsyncEngineArgs, AsyncLLMEngine
+try:
+    # vLLM >= 0.10.0
+    from vllm import AsyncEngineArgs
+except ImportError:
+    # vLLM < 0.10.0 (e.g., 0.9.2)
+    from vllm.engine.async_llm_engine import AsyncEngineArgs
+from vllm.engine.async_llm_engine import AsyncLLMEngine
 from typing import Dict, Any, Optional, List
 import asyncio
 from utils.logger_local import logger
@@ -43,8 +49,11 @@ class VLLMEngineWrapper:
             tensor_parallel_size=self.model_config["tp_size"],  # 如果需要加载自定义模型
             # vLLM并发配置
             max_num_batched_tokens=self.model_config.get(
-                "max_num_batched_tokens", 4096),
+                "max_num_batched_tokens", 2048),
             max_num_seqs=self.model_config.get("max_num_seqs", 2),
+            swap_space=self.model_config.get("max_num_seqs", 4),                    # 💾 启用 CPU 交换空间（单位: GB）
+            enforce_eager=self.model_config.get("enforce_eager", True),
+            disable_log_stats=self.model_config.get("disable_log_stats", False),
         )
 
         return AsyncLLMEngine.from_engine_args(engine_args)

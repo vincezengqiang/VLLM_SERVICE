@@ -171,5 +171,12 @@ class ModelManager:
         return model_name in self.model_configs
 
 
-# 全局模型管理器实例
-model_manager = ModelManager()
+# 全局模型管理器实例（延迟初始化）
+model_manager = None
+
+def get_model_manager():
+    """获取模型管理器实例（延迟初始化）"""
+    global model_manager
+    if model_manager is None:
+        model_manager = ModelManager()
+    return model_manager
